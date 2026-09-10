@@ -5,16 +5,17 @@ Aplicativo web mobile-first para acompanhar treinos de duas pessoas no mesmo nav
 ## O que inclui
 
 - Perfis separados para cada pessoa.
+- Exclusao de perfil com confirmacao.
 - Onboarding com peso atual, peso alvo, altura, idade, objetivo, experiencia e local de treino.
 - Plano automatico de 4 semanas.
 - Treinos adaptados para 2 a 6 dias por semana.
 - Preferencias para superset, conjugado/bi-set, circuito e finalizador.
 - Registro de repeticoes e carga por exercicio.
-- Miniaturas ilustrativas ao lado de cada exercicio.
+- Imagens de referencia ao lado de cada exercicio.
 - Links de video no YouTube para execucao correta.
 - Progresso, aderencia e sequencia diaria.
 - Botao para mudar objetivos e atualizar o plano.
-- Senha local para proteger mudancas no plano.
+- Senha master para abrir o app e senha local para proteger mudancas no plano.
 - Manifesto e service worker para instalacao como PWA.
 
 ## Publicacao no GitHub Pages
