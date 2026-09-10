@@ -10,8 +10,11 @@ Aplicativo web mobile-first para acompanhar treinos de duas pessoas no mesmo nav
 - Treinos adaptados para 2 a 6 dias por semana.
 - Preferencias para superset, conjugado/bi-set, circuito e finalizador.
 - Registro de repeticoes e carga por exercicio.
+- Miniaturas ilustrativas ao lado de cada exercicio.
 - Links de video no YouTube para execucao correta.
 - Progresso, aderencia e sequencia diaria.
+- Botao para mudar objetivos e atualizar o plano.
+- Senha local para proteger mudancas no plano.
 - Manifesto e service worker para instalacao como PWA.
 
 ## Publicacao no GitHub Pages
@@ -23,4 +26,4 @@ Este projeto foi preparado para rodar direto da raiz do repositorio.
 3. Escolha `main` e `/ (root)`.
 4. Salve e aguarde a publicacao.
 
-O app salva os dados no armazenamento local do navegador.
+O app salva os dados e a senha no armazenamento local do navegador. A senha protege mudancas no plano neste aparelho; para login real entre varios aparelhos, sera necessario adicionar um backend.
