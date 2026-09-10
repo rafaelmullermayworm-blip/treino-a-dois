@@ -1,0 +1,24 @@
+{
+  "name": "Treino a Dois",
+  "short_name": "Treino 2",
+  "description": "Aplicativo de treinos de 4 semanas para dois perfis.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#edf4f4",
+  "theme_color": "#0e7c86",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%230e7c86'/%3E%3Cpath d='M42 104h108v18H42zM62 70h68v18H62zM74 132h44v18H74z' fill='white'/%3E%3Ccircle cx='52' cy='79' r='15' fill='%23ef5d4f'/%3E%3Ccircle cx='140' cy='141' r='15' fill='%23f0b84b'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='86' fill='%230e7c86'/%3E%3Cpath d='M112 276h288v48H112zM166 188h180v48H166zM198 356h116v48H198z' fill='white'/%3E%3Ccircle cx='138' cy='212' r='40' fill='%23ef5d4f'/%3E%3Ccircle cx='374' cy='380' r='40' fill='%23f0b84b'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
