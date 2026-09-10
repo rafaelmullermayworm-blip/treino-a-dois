@@ -260,7 +260,7 @@
 
     .exercise {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 94px 94px 46px;
+      grid-template-columns: 78px minmax(0, 1fr) 94px 94px 46px;
       gap: 10px;
       align-items: center;
       padding: 12px;
@@ -278,6 +278,15 @@
       display: grid;
       gap: 4px;
       min-width: 0;
+    }
+
+    .exercise-thumb {
+      width: 78px;
+      height: 78px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      background: #dbe8ea;
     }
 
     .exercise-name strong {
@@ -403,12 +412,21 @@
       align-items: center;
     }
 
+    .security-note {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f2f7f7;
+      border: 1px solid var(--line);
+    }
+
     @media (max-width: 880px) {
       .app { padding: 12px; }
       .shell { grid-template-columns: 1fr; }
       .sidebar { position: static; }
       .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .exercise { grid-template-columns: minmax(0, 1fr) 1fr 1fr 44px; }
+      .exercise { grid-template-columns: 76px minmax(0, 1fr) 1fr 1fr 44px; }
+      .exercise-thumb { width: 76px; height: 76px; }
       .form-grid, .checks { grid-template-columns: 1fr; }
     }
 
@@ -418,10 +436,30 @@
       .btn { flex: 1 1 auto; }
       .hero { min-height: 190px; padding: 18px; }
       .exercise {
-        grid-template-columns: 1fr 1fr 44px;
+        grid-template-columns: 72px minmax(0, 1fr) minmax(0, 1fr) 44px;
+      }
+      .exercise-thumb {
+        width: 72px;
+        height: 72px;
+        grid-column: 1;
+        grid-row: 1 / span 2;
       }
       .exercise-name {
-        grid-column: 1 / -1;
+        grid-column: 2 / span 2;
+        grid-row: 1;
+      }
+      .reps-field {
+        grid-column: 2;
+        grid-row: 2;
+      }
+      .load-field {
+        grid-column: 3;
+        grid-row: 2;
+      }
+      .exercise .video {
+        grid-column: 4;
+        grid-row: 1 / span 2;
+        align-self: center;
       }
       .stat strong { font-size: 24px; }
     }
@@ -439,6 +477,8 @@
       </div>
       <div class="toolbar">
         <button class="btn secondary" id="installBtn" hidden>Instalar</button>
+        <button class="btn secondary" id="goalBtn">Mudar objetivos</button>
+        <button class="btn secondary" id="securityBtn">Senha</button>
         <button class="btn" id="newProfileBtn">Novo perfil</button>
       </div>
     </header>
@@ -452,6 +492,7 @@
           </div>
         </div>
         <div class="profile-list" id="profileList"></div>
+        <p class="security-note small" id="securityStatus">Senha do plano: nao definida.</p>
       </aside>
 
       <section class="main">
@@ -511,7 +552,7 @@
       <div class="section-head">
         <div>
           <h2 id="modalTitle">Novo perfil</h2>
-          <p class="muted small">Os dados ficam salvos apenas neste navegador.</p>
+          <p class="muted small" id="modalText">Os dados ficam salvos apenas neste navegador.</p>
         </div>
         <button class="btn secondary icon" type="button" id="closeModalBtn" aria-label="Fechar">X</button>
       </div>
@@ -592,8 +633,42 @@
     </form>
   </div>
 
+  <div class="modal" id="securityModal" role="dialog" aria-modal="true" aria-labelledby="securityTitle">
+    <form class="panel dialog" id="securityForm">
+      <input type="hidden" id="securityMode" value="setup">
+      <div class="section-head">
+        <div>
+          <h2 id="securityTitle">Senha do plano</h2>
+          <p class="muted small" id="securityIntro">Proteja mudancas no plano e nos objetivos.</p>
+        </div>
+        <button class="btn secondary icon" type="button" id="closeSecurityBtn" aria-label="Fechar">X</button>
+      </div>
+      <div class="form-grid" style="margin-top:14px">
+        <div class="field" id="currentPasswordField">
+          <label for="currentPassword">Senha atual</label>
+          <input id="currentPassword" type="password" autocomplete="current-password" placeholder="Digite a senha">
+        </div>
+        <div class="field" id="newPasswordField">
+          <label for="newPassword">Nova senha ou PIN</label>
+          <input id="newPassword" type="password" autocomplete="new-password" minlength="4" placeholder="Minimo 4 caracteres">
+        </div>
+        <div class="field" id="confirmPasswordField">
+          <label for="confirmPassword">Confirmar senha</label>
+          <input id="confirmPassword" type="password" autocomplete="new-password" minlength="4" placeholder="Repita a senha">
+        </div>
+      </div>
+      <p class="security-note small" id="securityMessage">Use uma senha ou PIN facil para voces lembrarem.</p>
+      <div class="toolbar" style="margin-top:16px; justify-content:flex-end">
+        <button class="btn secondary" type="button" id="lockNowBtn">Bloquear agora</button>
+        <button class="btn secondary" type="button" id="cancelSecurityBtn">Cancelar</button>
+        <button class="btn" type="submit" id="securitySubmitBtn">Salvar senha</button>
+      </div>
+    </form>
+  </div>
+
   <script>
     const storeKey = "treino-a-dois-state-v2";
+    const unlockKey = "treino-a-dois-unlocked-v2";
     const todayKey = () => new Date().toISOString().slice(0, 10);
     const phases = [
       { name: "Base", detail: "Tecnica limpa, ritmo controlado e carga confortavel.", boost: 0 },
@@ -734,12 +809,22 @@
     let activeId = state.activeId || null;
     let week = state.week || 1;
     let day = state.day || 0;
+    let editingProfileId = null;
+    let pendingProtectedAction = null;
 
     function loadState() {
       try {
-        return JSON.parse(localStorage.getItem(storeKey)) || { profiles: [], logs: {} };
+        const saved = JSON.parse(localStorage.getItem(storeKey)) || {};
+        return {
+          profiles: Array.isArray(saved.profiles) ? saved.profiles : [],
+          logs: saved.logs || {},
+          activeId: saved.activeId || null,
+          week: saved.week || 1,
+          day: saved.day || 0,
+          security: saved.security || { hash: "" }
+        };
       } catch {
-        return { profiles: [], logs: {} };
+        return { profiles: [], logs: {}, security: { hash: "" } };
       }
     }
 
@@ -758,6 +843,29 @@
       return state.profiles.find((item) => item.id === activeId) || state.profiles[0];
     }
 
+    function hasPassword() {
+      return Boolean(state.security && state.security.hash);
+    }
+
+    function isLocked() {
+      return hasPassword() && sessionStorage.getItem(unlockKey) !== "yes";
+    }
+
+    function requireUnlocked(action) {
+      if (!isLocked()) {
+        action();
+        return;
+      }
+      pendingProtectedAction = action;
+      openSecurityModal("unlock");
+    }
+
+    async function hashPassword(password) {
+      const data = new TextEncoder().encode(`treino-a-dois:${password}`);
+      const digest = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+    }
+
     function selectedDays(user) {
       const base = templates[user.place].slice(0, Number(user.days));
       return base.map((workout, index) => {
@@ -774,6 +882,30 @@
       return "https://www.youtube.com/results?search_query=" + encodeURIComponent(query + " execucao correta");
     }
 
+    function exerciseKind(name) {
+      const value = name.toLowerCase();
+      if (/supino|peito|flexao|crucifixo|triceps|mergulho/.test(value)) return ["PEITO", "#0e7c86", "#9ad8dd"];
+      if (/remada|puxada|costas|barra|rosca|biceps/.test(value)) return ["COSTAS", "#456990", "#b9cce0"];
+      if (/agachamento|leg|terra|passada|panturrilha|degrau|stiff|perna/.test(value)) return ["PERNA", "#2d9d78", "#bfe6d7"];
+      if (/ombro|desenvolvimento|elevacao|face pull/.test(value)) return ["OMBRO", "#f06449", "#f5beb1"];
+      if (/abdominal|core|prancha|bicicleta/.test(value)) return ["CORE", "#7952b3", "#d8c8f1"];
+      if (/corrida|caminhada|bike|cardio|shadow|finalizador|circuito|alongamento|respiracao/.test(value)) return ["CARDIO", "#d18428", "#f4d3a5"];
+      return ["TREINO", "#1f8a99", "#bddfe4"];
+    }
+
+    function exerciseArt(name) {
+      const [label, color, soft] = exerciseKind(name);
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+          <rect width="120" height="120" rx="14" fill="${soft}"/>
+          <circle cx="37" cy="31" r="10" fill="${color}"/>
+          <path d="M34 44c16-9 33-9 49 0" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round"/>
+          <path d="M39 57h42M46 70h28M33 83h54" fill="none" stroke="#12343b" stroke-width="7" stroke-linecap="round"/>
+          <text x="60" y="108" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="800" fill="#12343b">${label}</text>
+        </svg>`;
+      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+    }
+
     function logKey(profileId, weekNumber, dayIndex, exerciseIndex) {
       return `${profileId}:w${weekNumber}:d${dayIndex}:e${exerciseIndex}`;
     }
@@ -783,7 +915,7 @@
       list.innerHTML = "";
       if (!state.profiles.length) {
         list.innerHTML = `<div class="empty"><p class="muted">Crie o primeiro perfil para gerar o plano.</p><button class="btn" type="button" data-open-profile>Criar perfil</button></div>`;
-        list.querySelector("[data-open-profile]").addEventListener("click", openModal);
+        list.querySelector("[data-open-profile]").addEventListener("click", requestProfileCreate);
         return;
       }
 
@@ -824,7 +956,7 @@
         $("weekNote").innerHTML = "";
         $("dayTabs").innerHTML = "";
         $("exerciseList").innerHTML = `<div class="empty"><button class="btn" type="button" data-open-profile>Criar primeiro perfil</button></div>`;
-        $("exerciseList").querySelector("[data-open-profile]").addEventListener("click", openModal);
+        $("exerciseList").querySelector("[data-open-profile]").addEventListener("click", requestProfileCreate);
         return;
       }
 
@@ -876,15 +1008,16 @@
         const row = document.createElement("article");
         row.className = "exercise" + (log.reps || log.load ? " done" : "");
         row.innerHTML = `
+          <img class="exercise-thumb" src="${exerciseArt(exercise[0])}" alt="Imagem ilustrativa de ${escapeHtml(exercise[0])}">
           <div class="exercise-name">
             <strong>${escapeHtml(exercise[0])}</strong>
             <span class="muted small">${adjustPrescription(exercise[1], phase.boost)}</span>
           </div>
-          <div class="field">
+          <div class="field reps-field">
             <label>Reps</label>
             <input inputmode="numeric" data-log="${key}" data-field="reps" value="${escapeHtml(log.reps || "")}" placeholder="0">
           </div>
-          <div class="field">
+          <div class="field load-field">
             <label>Kg</label>
             <input inputmode="decimal" data-log="${key}" data-field="load" value="${escapeHtml(log.load || "")}" placeholder="0">
           </div>
@@ -950,16 +1083,87 @@
       return count;
     }
 
-    function openModal() {
+    function renderSecurityStatus() {
+      if (!hasPassword()) {
+        $("securityStatus").textContent = "Senha do plano: nao definida.";
+        $("securityBtn").textContent = "Criar senha";
+        return;
+      }
+      $("securityStatus").textContent = isLocked()
+        ? "Senha do plano: bloqueada. Mudancas pedem senha."
+        : "Senha do plano: desbloqueada nesta sessao.";
+      $("securityBtn").textContent = isLocked() ? "Desbloquear" : "Senha";
+    }
+
+    function requestProfileCreate() {
+      requireUnlocked(() => openModal());
+    }
+
+    function requestProfileEdit() {
+      const user = profile();
+      if (!user) {
+        requestProfileCreate();
+        return;
+      }
+      requireUnlocked(() => openModal(user));
+    }
+
+    function openModal(user = null) {
+      editingProfileId = user ? user.id : null;
       $("profileForm").reset();
-      $("days").value = "5";
-      $("duration").value = "50 min";
+      $("modalTitle").textContent = user ? "Mudar objetivos" : "Novo perfil";
+      $("modalText").textContent = user
+        ? "Ajuste objetivo, peso, dias e preferencias do plano."
+        : "Os dados ficam salvos apenas neste navegador.";
+      $("name").value = user?.name || "";
+      $("goal").value = user?.goal || "Hipertrofia";
+      $("weight").value = user?.weight || "";
+      $("targetWeight").value = user?.targetWeight || "";
+      $("height").value = user?.height || "";
+      $("age").value = user?.age || "";
+      $("experience").value = user?.experience || "Iniciante";
+      $("days").value = user?.days || "5";
+      $("place").value = user?.place || "Academia";
+      $("duration").value = user?.duration || "50 min";
+      $("superset").checked = Boolean(user?.superset);
+      $("biset").checked = Boolean(user?.biset);
+      $("circuit").checked = Boolean(user?.circuit);
+      $("finisher").checked = Boolean(user?.finisher);
       $("profileModal").classList.add("open");
       setTimeout(() => $("name").focus(), 30);
     }
 
     function closeModal() {
       $("profileModal").classList.remove("open");
+      editingProfileId = null;
+    }
+
+    function openSecurityModal(mode = hasPassword() ? "unlock" : "setup") {
+      $("securityForm").reset();
+      $("securityMode").value = mode;
+      $("securityMessage").textContent = "Use uma senha ou PIN facil para voces lembrarem.";
+      const hasSavedPassword = hasPassword();
+      const isUnlock = mode === "unlock";
+      $("securityTitle").textContent = isUnlock ? "Desbloquear plano" : hasSavedPassword ? "Alterar senha" : "Criar senha";
+      $("securityIntro").textContent = isUnlock
+        ? "Digite a senha para mudar objetivos ou atualizar o plano."
+        : "A senha protege mudancas no plano neste aparelho.";
+      $("currentPasswordField").style.display = hasSavedPassword ? "grid" : "none";
+      $("newPasswordField").style.display = isUnlock ? "none" : "grid";
+      $("confirmPasswordField").style.display = isUnlock ? "none" : "grid";
+      $("lockNowBtn").style.display = hasSavedPassword && !isLocked() ? "inline-flex" : "none";
+      $("securitySubmitBtn").textContent = isUnlock ? "Desbloquear" : "Salvar senha";
+      $("securityModal").classList.add("open");
+      setTimeout(() => (isUnlock || hasSavedPassword ? $("currentPassword") : $("newPassword")).focus(), 30);
+    }
+
+    function closeSecurityModal() {
+      $("securityModal").classList.remove("open");
+      pendingProtectedAction = null;
+    }
+
+    function showSecurityMessage(text) {
+      $("securityMessage").textContent = text;
     }
 
     function escapeHtml(value) {
@@ -973,11 +1177,13 @@
     }
 
     function render() {
+      renderSecurityStatus();
       renderProfiles();
       renderMain();
     }
 
-    $("newProfileBtn").addEventListener("click", openModal);
+    $("newProfileBtn").addEventListener("click", requestProfileCreate);
+    $("goalBtn").addEventListener("click", requestProfileEdit);
     $("closeModalBtn").addEventListener("click", closeModal);
     $("cancelProfileBtn").addEventListener("click", closeModal);
     $("profileModal").addEventListener("click", (event) => {
@@ -986,9 +1192,8 @@
 
     $("profileForm").addEventListener("submit", (event) => {
       event.preventDefault();
-      const data = Object.fromEntries(new FormData(event.currentTarget));
       const item = {
-        id: uid(),
+        id: editingProfileId || uid(),
         name: $("name").value.trim(),
         goal: $("goal").value,
         weight: $("weight").value,
@@ -1003,10 +1208,19 @@
         biset: $("biset").checked,
         circuit: $("circuit").checked,
         finisher: $("finisher").checked,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
       if (!item.name) return;
-      state.profiles.push(item);
+      if (editingProfileId) {
+        const index = state.profiles.findIndex((profileItem) => profileItem.id === editingProfileId);
+        if (index >= 0) {
+          item.createdAt = state.profiles[index].createdAt || item.createdAt;
+          state.profiles[index] = item;
+        }
+      } else {
+        state.profiles.push(item);
+      }
       activeId = item.id;
       week = 1;
       day = 0;
@@ -1028,11 +1242,70 @@
     });
 
     $("refreshPlanBtn").addEventListener("click", () => {
-      const user = profile();
-      if (!user) return openModal();
-      week = week === 4 ? 1 : week + 1;
-      day = 0;
+      requireUnlocked(() => {
+        const user = profile();
+        if (!user) return openModal();
+        week = week === 4 ? 1 : week + 1;
+        day = 0;
+        saveState();
+        render();
+      });
+    });
+
+    $("securityBtn").addEventListener("click", () => {
+      openSecurityModal(hasPassword() && isLocked() ? "unlock" : "change");
+    });
+
+    $("closeSecurityBtn").addEventListener("click", closeSecurityModal);
+    $("cancelSecurityBtn").addEventListener("click", closeSecurityModal);
+    $("securityModal").addEventListener("click", (event) => {
+      if (event.target.id === "securityModal") closeSecurityModal();
+    });
+
+    $("lockNowBtn").addEventListener("click", () => {
+      sessionStorage.removeItem(unlockKey);
+      closeSecurityModal();
+      render();
+    });
+
+    $("securityForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const mode = $("securityMode").value;
+      const current = $("currentPassword").value;
+      const next = $("newPassword").value;
+      const confirm = $("confirmPassword").value;
+
+      if (hasPassword()) {
+        const currentHash = await hashPassword(current);
+        if (currentHash !== state.security.hash) {
+          showSecurityMessage("Senha incorreta. Tente novamente.");
+          return;
+        }
+      }
+
+      if (mode === "unlock") {
+        sessionStorage.setItem(unlockKey, "yes");
+        const action = pendingProtectedAction;
+        pendingProtectedAction = null;
+        $("securityModal").classList.remove("open");
+        render();
+        if (action) action();
+        return;
+      }
+
+      if (next.length < 4) {
+        showSecurityMessage("Use pelo menos 4 caracteres.");
+        return;
+      }
+      if (next !== confirm) {
+        showSecurityMessage("A confirmacao nao bate com a senha.");
+        return;
+      }
+
+      state.security = { hash: await hashPassword(next), updatedAt: new Date().toISOString() };
+      sessionStorage.setItem(unlockKey, "yes");
       saveState();
+      closeSecurityModal();
       render();
     });
 
