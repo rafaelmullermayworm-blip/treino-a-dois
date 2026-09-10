@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0e7c86">
+  <title>Treino a Dois</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #132023;
+      --muted: #5d6d72;
+      --line: #d9e2e4;
+      --surface: #ffffff;
+      --surface-2: #f3f7f7;
+      --teal: #0e7c86;
+      --teal-2: #095f66;
+      --coral: #ef5d4f;
+      --gold: #f0b84b;
+      --green: #2d9d78;
+      --shadow: 0 16px 40px rgba(12, 39, 45, .12);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, rgba(14, 124, 134, .12), transparent 32%),
+        linear-gradient(225deg, rgba(239, 93, 79, .12), transparent 30%),
+        #edf4f4;
+      color: var(--ink);
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg, var(--teal), var(--coral));
+      font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(26px, 4vw, 42px); letter-spacing: 0; line-height: 1; }
+    h2 { font-size: 22px; }
+    h3 { font-size: 15px; }
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
+
+    .panel {
+      background: rgba(255, 255, 255, .88);
+      border: 1px solid rgba(217, 226, 228, .9);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 14px;
+      padding: 14px;
+    }
+
+    .main {
+      display: grid;
+      gap: 14px;
+    }
+
+    .profile-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .profile-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--surface-2);
+      border: 1px solid transparent;
+      text-align: left;
+      color: var(--ink);
+    }
+
+    .profile-card.active {
+      border-color: var(--teal);
+      background: #e7f5f6;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #e7f5f6;
+      color: var(--teal-2);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      min-height: 40px;
+      border-radius: 8px;
+      padding: 0 12px;
+      background: var(--teal);
+      color: #fff;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn.secondary {
+      background: #e8eeee;
+      color: var(--ink);
+    }
+
+    .btn.danger { background: var(--coral); }
+    .btn.icon { width: 40px; padding: 0; }
+
+    .hero {
+      min-height: 220px;
+      overflow: hidden;
+      position: relative;
+      padding: 24px;
+      display: grid;
+      align-content: end;
+      background:
+        linear-gradient(120deg, rgba(5, 50, 56, .88), rgba(14, 124, 134, .72)),
+        url("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1600&q=80") center/cover;
+      color: #fff;
+    }
+
+    .hero h2 {
+      font-size: clamp(28px, 5vw, 54px);
+      line-height: .98;
+      letter-spacing: 0;
+      max-width: 720px;
+    }
+
+    .hero p {
+      margin-top: 10px;
+      max-width: 640px;
+      color: rgba(255,255,255,.84);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      padding: 14px;
+      min-height: 104px;
+      display: grid;
+      align-content: space-between;
+    }
+
+    .stat strong {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .section {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tabs {
+      display: flex;
+      overflow-x: auto;
+      gap: 8px;
+      padding-bottom: 2px;
+    }
+
+    .tab {
+      min-width: 74px;
+      height: 42px;
+      border-radius: 8px;
+      background: #e8eeee;
+      color: var(--ink);
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    .tab.active {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .workout-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .exercise {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 94px 94px 46px;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+    }
+
+    .exercise.done {
+      border-color: rgba(45, 157, 120, .55);
+      background: #edf8f4;
+    }
+
+    .exercise-name {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .exercise-name strong {
+      overflow-wrap: anywhere;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    input, select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 10px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(14, 124, 134, .16);
+    }
+
+    .video {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--coral);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 900;
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 999px;
+      background: #dde8ea;
+      overflow: hidden;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--teal), var(--green));
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .checks {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .check {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink);
+      font-weight: 750;
+    }
+
+    .check input {
+      width: 18px;
+      height: 18px;
+      min-height: 18px;
+      accent-color: var(--teal);
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(9, 28, 33, .55);
+      z-index: 10;
+    }
+
+    .modal.open { display: grid; }
+
+    .dialog {
+      width: min(760px, 100%);
+      max-height: min(860px, 92vh);
+      overflow: auto;
+      padding: 18px;
+    }
+
+    .empty {
+      padding: 26px;
+      text-align: center;
+      display: grid;
+      gap: 12px;
+      place-items: center;
+    }
+
+    .week-note {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    @media (max-width: 880px) {
+      .app { padding: 12px; }
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .exercise { grid-template-columns: minmax(0, 1fr) 1fr 1fr 44px; }
+      .form-grid, .checks { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .topbar { align-items: flex-start; }
+      .toolbar { width: 100%; }
+      .btn { flex: 1 1 auto; }
+      .hero { min-height: 190px; padding: 18px; }
+      .exercise {
+        grid-template-columns: 1fr 1fr 44px;
+      }
+      .exercise-name {
+        grid-column: 1 / -1;
+      }
+      .stat strong { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">T2</div>
+        <div>
+          <h1>Treino a Dois</h1>
+          <p class="muted small">Plano de 4 semanas para treinar com constancia.</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="btn secondary" id="installBtn" hidden>Instalar</button>
+        <button class="btn" id="newProfileBtn">Novo perfil</button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="panel sidebar">
+        <div class="section-head">
+          <div>
+            <h2>Perfis</h2>
+            <p class="muted small">Escolha quem vai treinar agora.</p>
+          </div>
+        </div>
+        <div class="profile-list" id="profileList"></div>
+      </aside>
+
+      <section class="main">
+        <div class="panel hero">
+          <div>
+            <span class="pill" id="phasePill">Semana 1</span>
+            <h2 id="heroTitle">Hoje tem treino.</h2>
+            <p id="heroText">Registre repeticoes e cargas para acompanhar a evolucao de cada pessoa.</p>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="panel stat">
+            <span class="muted small">Meta</span>
+            <strong id="goalStat">--</strong>
+            <span class="muted small">peso alvo</span>
+          </div>
+          <div class="panel stat">
+            <span class="muted small">Progresso</span>
+            <strong id="progressStat">0%</strong>
+            <div class="progress"><span id="programBar"></span></div>
+          </div>
+          <div class="panel stat">
+            <span class="muted small">Aderencia</span>
+            <strong id="adherenceStat">0%</strong>
+            <span class="muted small">exercicios feitos</span>
+          </div>
+          <div class="panel stat">
+            <span class="muted small">Sequencia</span>
+            <strong id="streakStat">0</strong>
+            <span class="muted small">dias registrados</span>
+          </div>
+        </div>
+
+        <section class="panel section">
+          <div class="section-head">
+            <div>
+              <h2 id="workoutTitle">Treino</h2>
+              <p class="muted small" id="workoutSubtitle">Selecione um perfil para comecar.</p>
+            </div>
+            <div class="toolbar">
+              <button class="btn secondary" id="prevWeekBtn">Semana -</button>
+              <button class="btn secondary" id="nextWeekBtn">Semana +</button>
+              <button class="btn danger" id="refreshPlanBtn">Atualizar plano</button>
+            </div>
+          </div>
+          <div class="week-note" id="weekNote"></div>
+          <div class="tabs" id="dayTabs"></div>
+          <div class="workout-grid" id="exerciseList"></div>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <div class="modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <form class="panel dialog" id="profileForm">
+      <div class="section-head">
+        <div>
+          <h2 id="modalTitle">Novo perfil</h2>
+          <p class="muted small">Os dados ficam salvos apenas neste navegador.</p>
+        </div>
+        <button class="btn secondary icon" type="button" id="closeModalBtn" aria-label="Fechar">X</button>
+      </div>
+      <div class="form-grid" style="margin-top:14px">
+        <div class="field">
+          <label for="name">Nome</label>
+          <input id="name" required placeholder="Rafael">
+        </div>
+        <div class="field">
+          <label for="goal">Objetivo</label>
+          <select id="goal">
+            <option>Hipertrofia</option>
+            <option>Perda de gordura</option>
+            <option>Condicionamento</option>
+            <option>Forca</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="weight">Peso atual (kg)</label>
+          <input id="weight" type="number" min="35" max="220" step="0.1" required>
+        </div>
+        <div class="field">
+          <label for="targetWeight">Peso alvo (kg)</label>
+          <input id="targetWeight" type="number" min="35" max="220" step="0.1" required>
+        </div>
+        <div class="field">
+          <label for="height">Altura (cm)</label>
+          <input id="height" type="number" min="120" max="230" required>
+        </div>
+        <div class="field">
+          <label for="age">Idade</label>
+          <input id="age" type="number" min="14" max="90" required>
+        </div>
+        <div class="field">
+          <label for="experience">Experiencia</label>
+          <select id="experience">
+            <option>Iniciante</option>
+            <option>Intermediario</option>
+            <option>Avancado</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="days">Dias por semana</label>
+          <select id="days">
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option selected>5</option>
+            <option>6</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="place">Local</label>
+          <select id="place">
+            <option>Academia</option>
+            <option>Casa</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="duration">Duracao media</label>
+          <select id="duration">
+            <option>35 min</option>
+            <option selected>50 min</option>
+            <option>65 min</option>
+          </select>
+        </div>
+      </div>
+      <div class="checks" style="margin-top:14px">
+        <label class="check"><input type="checkbox" id="superset"> Superset</label>
+        <label class="check"><input type="checkbox" id="biset"> Conjugado</label>
+        <label class="check"><input type="checkbox" id="circuit"> Circuito</label>
+        <label class="check"><input type="checkbox" id="finisher"> Finalizador</label>
+      </div>
+      <div class="toolbar" style="margin-top:16px; justify-content:flex-end">
+        <button class="btn secondary" type="button" id="cancelProfileBtn">Cancelar</button>
+        <button class="btn" type="submit">Salvar plano</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const storeKey = "treino-a-dois-state-v2";
+    const todayKey = () => new Date().toISOString().slice(0, 10);
+    const phases = [
+      { name: "Base", detail: "Tecnica limpa, ritmo controlado e carga confortavel.", boost: 0 },
+      { name: "Progressao", detail: "Aumente 1 ou 2 repeticoes nos principais movimentos.", boost: 1 },
+      { name: "Sobrecarga", detail: "Suba a carga quando completar todas as repeticoes.", boost: 2 },
+      { name: "Deload", detail: "Reduza a carga e preserve amplitude e controle.", boost: -1 }
+    ];
+
+    const templates = {
+      Academia: [
+        {
+          title: "Peito & Triceps",
+          exercises: [
+            ["Supino reto", "4x8-10", "supino reto execucao correta"],
+            ["Supino inclinado halteres", "3x10-12", "supino inclinado com halteres"],
+            ["Crucifixo no cabo", "3x12-15", "crucifixo no cabo"],
+            ["Triceps corda", "3x10-12", "triceps corda polia"],
+            ["Triceps testa", "3x10-12", "triceps testa barra w"]
+          ]
+        },
+        {
+          title: "Costas & Biceps",
+          exercises: [
+            ["Puxada frente", "4x8-10", "puxada frente pulley"],
+            ["Remada baixa", "3x10-12", "remada baixa triangulo"],
+            ["Remada unilateral", "3x10 cada", "remada unilateral halter"],
+            ["Rosca direta", "3x8-10", "rosca direta barra"],
+            ["Rosca martelo", "3x10-12", "rosca martelo halteres"]
+          ]
+        },
+        {
+          title: "Perna completo",
+          exercises: [
+            ["Agachamento livre", "4x8-10", "agachamento livre tecnica"],
+            ["Leg press", "3x10-12", "leg press execucao"],
+            ["Cadeira extensora", "3x12-15", "cadeira extensora"],
+            ["Mesa flexora", "3x10-12", "mesa flexora"],
+            ["Panturrilha em pe", "4x12-15", "panturrilha em pe maquina"]
+          ]
+        },
+        {
+          title: "Ombros & Core",
+          exercises: [
+            ["Desenvolvimento", "4x8-10", "desenvolvimento ombro halteres"],
+            ["Elevacao lateral", "3x12-15", "elevacao lateral"],
+            ["Face pull", "3x12-15", "face pull polia"],
+            ["Prancha", "3x40s", "prancha abdominal correta"],
+            ["Abdominal na polia", "3x12-15", "abdominal na polia"]
+          ]
+        },
+        {
+          title: "Biceps & Triceps",
+          exercises: [
+            ["Rosca scott", "3x10-12", "rosca scott"],
+            ["Rosca alternada", "3x10 cada", "rosca alternada"],
+            ["Paralela ou mergulho", "3x8-12", "mergulho triceps paralela"],
+            ["Triceps frances", "3x10-12", "triceps frances halter"],
+            ["Caminhada inclinada", "12 min", "esteira caminhada inclinada"]
+          ]
+        },
+        {
+          title: "Full body tecnico",
+          exercises: [
+            ["Levantamento terra romeno", "3x8-10", "terra romeno"],
+            ["Supino maquina", "3x10-12", "supino maquina"],
+            ["Puxada neutra", "3x10-12", "puxada neutra"],
+            ["Avanco", "3x10 cada", "avanco passada"],
+            ["Bike intervalada", "10 min", "bike intervalada academia"]
+          ]
+        }
+      ],
+      Casa: [
+        {
+          title: "Superior em casa",
+          exercises: [
+            ["Flexao de braco", "4x8-15", "flexao de braco correta"],
+            ["Remada com mochila", "4x10-12", "remada com mochila"],
+            ["Desenvolvimento com mochila", "3x10-12", "desenvolvimento ombro mochila"],
+            ["Triceps banco", "3x10-12", "triceps banco"],
+            ["Prancha", "3x40s", "prancha abdominal correta"]
+          ]
+        },
+        {
+          title: "Pernas em casa",
+          exercises: [
+            ["Agachamento livre", "4x12-15", "agachamento livre sem peso"],
+            ["Avanco alternado", "3x10 cada", "avanco alternado"],
+            ["Ponte de gluteo", "4x12-15", "ponte de gluteo"],
+            ["Stiff com mochila", "3x10-12", "stiff com mochila"],
+            ["Panturrilha no degrau", "4x15", "panturrilha no degrau"]
+          ]
+        },
+        {
+          title: "Circuito metabolico",
+          exercises: [
+            ["Polichinelo", "4x45s", "polichinelo correto"],
+            ["Agachamento com salto", "3x10", "agachamento com salto"],
+            ["Mountain climber", "4x30s", "mountain climber"],
+            ["Burpee adaptado", "3x8", "burpee adaptado iniciante"],
+            ["Alongamento final", "6 min", "alongamento pos treino"]
+          ]
+        },
+        {
+          title: "Core & mobilidade",
+          exercises: [
+            ["Dead bug", "3x10 cada", "dead bug abdominal"],
+            ["Prancha lateral", "3x30s cada", "prancha lateral"],
+            ["Elevar pernas", "3x10-12", "elevacao de pernas abdominal"],
+            ["Mobilidade quadril", "6 min", "mobilidade de quadril"],
+            ["Mobilidade toracica", "6 min", "mobilidade toracica"]
+          ]
+        },
+        {
+          title: "Forca geral",
+          exercises: [
+            ["Flexao diamante", "3x6-10", "flexao diamante"],
+            ["Remada unilateral mochila", "3x10 cada", "remada unilateral mochila"],
+            ["Agachamento lento", "4x10", "agachamento tempo lento"],
+            ["Rosca com mochila", "3x12", "rosca biceps mochila"],
+            ["Escalador cruzado", "3x30s", "cross body mountain climber"]
+          ]
+        },
+        {
+          title: "Cardio leve",
+          exercises: [
+            ["Caminhada rapida", "20 min", "caminhada rapida emagrecimento"],
+            ["Subida no degrau", "4x60s", "step up exercicio"],
+            ["Shadow boxing", "4x45s", "shadow boxing treino"],
+            ["Abdominal bicicleta", "3x20", "abdominal bicicleta"],
+            ["Respiracao e alongamento", "5 min", "respiracao pos treino"]
+          ]
+        }
+      ]
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const state = loadState();
+    let activeId = state.activeId || null;
+    let week = state.week || 1;
+    let day = state.day || 0;
+
+    function loadState() {
+      try {
+        return JSON.parse(localStorage.getItem(storeKey)) || { profiles: [], logs: {} };
+      } catch {
+        return { profiles: [], logs: {} };
+      }
+    }
+
+    function saveState() {
+      state.activeId = activeId;
+      state.week = week;
+      state.day = day;
+      localStorage.setItem(storeKey, JSON.stringify(state));
+    }
+
+    function uid() {
+      return Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
+
+    function profile() {
+      return state.profiles.find((item) => item.id === activeId) || state.profiles[0];
+    }
+
+    function selectedDays(user) {
+      const base = templates[user.place].slice(0, Number(user.days));
+      return base.map((workout, index) => {
+        const extras = [];
+        if (user.superset && index % 2 === 0) extras.push(["Superset sugerido", "2 voltas", "superset treino musculacao"]);
+        if (user.biset && index % 2 === 1) extras.push(["Bi-set final", "2x12", "bi set musculacao"]);
+        if (user.circuit && workout.title.includes("Perna")) extras.push(["Circuito de core", "8 min", "circuito abdominal"]);
+        if (user.finisher) extras.push(["Finalizador cardio", "8-12 min", "cardio finalizador treino"]);
+        return { ...workout, exercises: workout.exercises.concat(extras) };
+      });
+    }
+
+    function videoUrl(query) {
+      return "https://www.youtube.com/results?search_query=" + encodeURIComponent(query + " execucao correta");
+    }
+
+    function logKey(profileId, weekNumber, dayIndex, exerciseIndex) {
+      return `${profileId}:w${weekNumber}:d${dayIndex}:e${exerciseIndex}`;
+    }
+
+    function renderProfiles() {
+      const list = $("profileList");
+      list.innerHTML = "";
+      if (!state.profiles.length) {
+        list.innerHTML = `<div class="empty"><p class="muted">Crie o primeiro perfil para gerar o plano.</p><button class="btn" type="button" data-open-profile>Criar perfil</button></div>`;
+        list.querySelector("[data-open-profile]").addEventListener("click", openModal);
+        return;
+      }
+
+      state.profiles.forEach((item) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "profile-card" + (item.id === activeId ? " active" : "");
+        button.innerHTML = `
+          <div>
+            <h3>${escapeHtml(item.name)}</h3>
+            <p class="muted small">${item.goal} · ${item.days} dias · ${item.place}</p>
+          </div>
+          <span class="pill">${item.weight}→${item.targetWeight} kg</span>
+        `;
+        button.addEventListener("click", () => {
+          activeId = item.id;
+          day = Math.min(day, Number(item.days) - 1);
+          saveState();
+          render();
+        });
+        list.appendChild(button);
+      });
+    }
+
+    function renderMain() {
+      const user = profile();
+      if (!user) {
+        $("heroTitle").textContent = "Monte o plano de voces.";
+        $("heroText").textContent = "Cadastre cada pessoa uma vez e acompanhe as quatro semanas pelo celular.";
+        $("phasePill").textContent = "Inicio";
+        $("goalStat").textContent = "--";
+        $("progressStat").textContent = "0%";
+        $("adherenceStat").textContent = "0%";
+        $("streakStat").textContent = "0";
+        $("programBar").style.width = "0%";
+        $("workoutTitle").textContent = "Sem perfil ativo";
+        $("workoutSubtitle").textContent = "Crie um perfil para gerar treinos.";
+        $("weekNote").innerHTML = "";
+        $("dayTabs").innerHTML = "";
+        $("exerciseList").innerHTML = `<div class="empty"><button class="btn" type="button" data-open-profile>Criar primeiro perfil</button></div>`;
+        $("exerciseList").querySelector("[data-open-profile]").addEventListener("click", openModal);
+        return;
+      }
+
+      const workouts = selectedDays(user);
+      const phase = phases[week - 1];
+      const activeWorkout = workouts[day] || workouts[0];
+      const completion = calculateCompletion(user, workouts);
+      const adherence = calculateAdherence(user, workouts);
+
+      $("phasePill").textContent = `Semana ${week} · ${phase.name}`;
+      $("heroTitle").textContent = `${user.name}, ${activeWorkout.title.toLowerCase()}.`;
+      $("heroText").textContent = `${user.goal}, ${user.duration}, ${user.experience.toLowerCase()}.`;
+      $("goalStat").textContent = `${user.targetWeight} kg`;
+      $("progressStat").textContent = `${completion}%`;
+      $("programBar").style.width = `${completion}%`;
+      $("adherenceStat").textContent = `${adherence}%`;
+      $("streakStat").textContent = calculateStreak(user.id);
+      $("workoutTitle").textContent = activeWorkout.title;
+      $("workoutSubtitle").textContent = `Dia ${day + 1} de ${workouts.length} · ${user.place}`;
+      $("weekNote").innerHTML = `<span class="pill">${phase.detail}</span>`;
+      renderTabs(workouts);
+      renderExercises(user, activeWorkout, phase);
+    }
+
+    function renderTabs(workouts) {
+      const wrap = $("dayTabs");
+      wrap.innerHTML = "";
+      workouts.forEach((workout, index) => {
+        const tab = document.createElement("button");
+        tab.className = "tab" + (index === day ? " active" : "");
+        tab.type = "button";
+        tab.textContent = `Dia ${index + 1}`;
+        tab.title = workout.title;
+        tab.addEventListener("click", () => {
+          day = index;
+          saveState();
+          render();
+        });
+        wrap.appendChild(tab);
+      });
+    }
+
+    function renderExercises(user, workout, phase) {
+      const list = $("exerciseList");
+      list.innerHTML = "";
+      workout.exercises.forEach((exercise, index) => {
+        const key = logKey(user.id, week, day, index);
+        const log = state.logs[key] || {};
+        const row = document.createElement("article");
+        row.className = "exercise" + (log.reps || log.load ? " done" : "");
+        row.innerHTML = `
+          <div class="exercise-name">
+            <strong>${escapeHtml(exercise[0])}</strong>
+            <span class="muted small">${adjustPrescription(exercise[1], phase.boost)}</span>
+          </div>
+          <div class="field">
+            <label>Reps</label>
+            <input inputmode="numeric" data-log="${key}" data-field="reps" value="${escapeHtml(log.reps || "")}" placeholder="0">
+          </div>
+          <div class="field">
+            <label>Kg</label>
+            <input inputmode="decimal" data-log="${key}" data-field="load" value="${escapeHtml(log.load || "")}" placeholder="0">
+          </div>
+          <a class="video" href="${videoUrl(exercise[2])}" target="_blank" rel="noopener" aria-label="Video no YouTube">▶</a>
+        `;
+        list.appendChild(row);
+      });
+
+      list.querySelectorAll("input[data-log]").forEach((input) => {
+        input.addEventListener("input", (event) => {
+          const target = event.currentTarget;
+          const key = target.dataset.log;
+          state.logs[key] = state.logs[key] || { date: todayKey() };
+          state.logs[key][target.dataset.field] = target.value;
+          state.logs[key].date = todayKey();
+          saveState();
+          renderProfiles();
+          updateStatsOnly();
+          target.closest(".exercise").classList.toggle("done", Boolean(state.logs[key].reps || state.logs[key].load));
+        });
+      });
+    }
+
+    function updateStatsOnly() {
+      const user = profile();
+      if (!user) return;
+      const workouts = selectedDays(user);
+      const completion = calculateCompletion(user, workouts);
+      $("progressStat").textContent = `${completion}%`;
+      $("programBar").style.width = `${completion}%`;
+      $("adherenceStat").textContent = `${calculateAdherence(user, workouts)}%`;
+      $("streakStat").textContent = calculateStreak(user.id);
+    }
+
+    function adjustPrescription(value, boost) {
+      if (boost === 0 || value.includes("min") || value.includes("s")) return value;
+      return value.replace(/(\d+)(?!.*x)/, (match) => String(Math.max(1, Number(match) + boost)));
+    }
+
+    function calculateCompletion(user, workouts) {
+      const total = workouts.reduce((sum, workout) => sum + workout.exercises.length, 0) * 4;
+      if (!total) return 0;
+      const done = Object.entries(state.logs).filter(([key, value]) => key.startsWith(`${user.id}:`) && (value.reps || value.load)).length;
+      return Math.min(100, Math.round((done / total) * 100));
+    }
+
+    function calculateAdherence(user, workouts) {
+      const currentTotal = workouts[day]?.exercises.length || 1;
+      const done = Object.entries(state.logs).filter(([key, value]) => key.startsWith(`${user.id}:w${week}:d${day}:`) && (value.reps || value.load)).length;
+      return Math.round((done / currentTotal) * 100);
+    }
+
+    function calculateStreak(profileId) {
+      const dates = new Set(Object.entries(state.logs)
+        .filter(([key, value]) => key.startsWith(`${profileId}:`) && (value.reps || value.load) && value.date)
+        .map(([, value]) => value.date));
+      let count = 0;
+      const cursor = new Date();
+      while (dates.has(cursor.toISOString().slice(0, 10))) {
+        count += 1;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      return count;
+    }
+
+    function openModal() {
+      $("profileForm").reset();
+      $("days").value = "5";
+      $("duration").value = "50 min";
+      $("profileModal").classList.add("open");
+      setTimeout(() => $("name").focus(), 30);
+    }
+
+    function closeModal() {
+      $("profileModal").classList.remove("open");
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function render() {
+      renderProfiles();
+      renderMain();
+    }
+
+    $("newProfileBtn").addEventListener("click", openModal);
+    $("closeModalBtn").addEventListener("click", closeModal);
+    $("cancelProfileBtn").addEventListener("click", closeModal);
+    $("profileModal").addEventListener("click", (event) => {
+      if (event.target.id === "profileModal") closeModal();
+    });
+
+    $("profileForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(event.currentTarget));
+      const item = {
+        id: uid(),
+        name: $("name").value.trim(),
+        goal: $("goal").value,
+        weight: $("weight").value,
+        targetWeight: $("targetWeight").value,
+        height: $("height").value,
+        age: $("age").value,
+        experience: $("experience").value,
+        days: $("days").value,
+        place: $("place").value,
+        duration: $("duration").value,
+        superset: $("superset").checked,
+        biset: $("biset").checked,
+        circuit: $("circuit").checked,
+        finisher: $("finisher").checked,
+        createdAt: new Date().toISOString()
+      };
+      if (!item.name) return;
+      state.profiles.push(item);
+      activeId = item.id;
+      week = 1;
+      day = 0;
+      saveState();
+      closeModal();
+      render();
+    });
+
+    $("prevWeekBtn").addEventListener("click", () => {
+      week = Math.max(1, week - 1);
+      saveState();
+      render();
+    });
+
+    $("nextWeekBtn").addEventListener("click", () => {
+      week = Math.min(4, week + 1);
+      saveState();
+      render();
+    });
+
+    $("refreshPlanBtn").addEventListener("click", () => {
+      const user = profile();
+      if (!user) return openModal();
+      week = week === 4 ? 1 : week + 1;
+      day = 0;
+      saveState();
+      render();
+    });
+
+    let deferredInstall = null;
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredInstall = event;
+      $("installBtn").hidden = false;
+    });
+
+    $("installBtn").addEventListener("click", async () => {
+      if (!deferredInstall) return;
+      deferredInstall.prompt();
+      await deferredInstall.userChoice;
+      deferredInstall = null;
+      $("installBtn").hidden = true;
+    });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js"));
+    }
+
+    if (!activeId && state.profiles[0]) activeId = state.profiles[0].id;
+    render();
+  </script>
+</body>
+</html>
